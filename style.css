@@ -24,6 +24,8 @@ button
     align-content: center;
     font-family: bd-miami;
     font-size: 4vw;
+    color: rgb(255, 133, 239);
+    text-shadow: .5vw .5vw rgb(19, 12, 6);
 }
 
 #calculator-body
@@ -47,10 +49,10 @@ button
 
 .solar-panel
 {
-    width: 10%;
+    width: 25%;
     height: 100%;
     box-sizing: border-box;
-    border: .5vw solid rgb(32, 61, 93);
+    border: .5vw solid rgb(82, 68, 67);
     background-color: black;
     float: left;
     display: inline-block;
@@ -63,13 +65,15 @@ button
     height: 12%;
     margin: 4vw auto 0 auto;
     background-color: lightgray;
+    /*background-color: rgb(73, 62, 68);*/
     border: .5vw solid rgb(32, 61, 93);
     box-sizing: border-box;
     text-align: right;
 }
-
 #display-record
 {
+    opacity: 1;
+    transition-duration: 2s;
     /*border: .1vw solid red;*/
     box-sizing: border-box;
     height: 34%;
@@ -80,12 +84,31 @@ button
 
 #display-current
 {
+    opacity: 1;
+    transition-duration: 2s;
     /*border: .1vw solid blue;*/
     box-sizing: border-box;
     height: 66%;
     width: 100%;
     font-size: 5vw;
     padding-right: 0.5vw;
+}
+
+#solar-panels:hover+#display>#display-record,
+#solar-panels:hover+#display>#display-current
+{
+    opacity: 0.2;
+    transition-duration: 2s;
+}
+
+#miami-label
+{
+    position: absolute;
+    font-family: bd-miami;
+    color: rgb(90, 238, 224);
+    left: 29.7vw;
+    top: 18vw;
+    font-size: 4vw;
 }
 
 .far-left-button
@@ -105,7 +128,7 @@ button
 #clear-buttons
 {
     width: 90%;
-    height: 10%;
+    height: 7.6%;
     margin: 3vw auto 0 auto;
 }
 
@@ -116,8 +139,19 @@ button
     height: 100%;
     float: left;
     border: .5vw solid rgb(32, 61, 93);
-    background-color: rgb(255, 169, 53);
+    background-color: rgb(90, 238, 224);
     box-sizing: border-box;
+}
+
+.clear-button>button
+{
+    color: rgb(255, 133, 239);
+    text-shadow: .5vw .5vw rgb(19, 12, 6);
+}
+
+.clear-button span
+{
+    opacity: 0.3;
 }
 
 #arithmetic-buttons
@@ -155,6 +189,7 @@ button
     float: left;
     background-color: rgb(254, 23, 189);
     border: .5vw solid rgb(32, 61, 93);
+    color: rgb(255, 133, 239);
     box-sizing: border-box;
 }
 
@@ -172,7 +207,7 @@ button
     margin-top: 7%;
     margin-bottom: 5%;
     width: 94%;
-    background-color: rgb(90, 238, 224);
+    background-color: rgb(255, 169, 53);
     height: 45%;
     border: .5vw solid rgb(32, 61, 93);
     box-sizing: border-box;
