@@ -28,6 +28,11 @@ button
     text-shadow: .5vw .5vw rgb(19, 12, 6);
 }
 
+button:disabled
+{
+    background-color: #515151;
+}
+
 #calculator-body
 {
     position: relative;
