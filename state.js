@@ -32,7 +32,6 @@ StateInitial.prototype.setButtons = function(buttons)
     this.disableButton(buttons[BUTTON_MULTIPLY]);
     this.disableButton(buttons[BUTTON_DIVIDE]);
     this.disableButton(buttons[BUTTON_EQUALS]);
-    this.disableButton(buttons[BUTTON_0]);
 };
 StateInitial.prototype.execute = function(calculator, button)
 {
@@ -41,6 +40,7 @@ StateInitial.prototype.execute = function(calculator, button)
 
     switch (button.textContent)
     {
+        case BUTTON_0:
         case BUTTON_1:
         case BUTTON_2:
         case BUTTON_3:
@@ -83,7 +83,9 @@ StateCreateNumberBlank.prototype.setButtons = function(buttons, formula)
     this.disableButton(buttons[BUTTON_MULTIPLY]);
     this.disableButton(buttons[BUTTON_DIVIDE]);
     this.disableButton(buttons[BUTTON_EQUALS]);
-    this.disableButton(buttons[BUTTON_0]);
+
+
+    //this.disableButton(buttons[BUTTON_0]);
 };
 StateCreateNumberBlank.prototype.execute = function(calculator, button)
 {
@@ -151,7 +153,7 @@ StateCreateNumber.prototype.execute = function(calculator, button)
         case BUTTON_7:
         case BUTTON_8:
         case BUTTON_9:
-            if (calculator.formula[length - 1] == 'BLANK')
+            if (calculator.formula[length - 1] == STR_BLANK)
                 calculator.formula[length - 1] = '';
             calculator.formula[length - 1] += button.textContent;
             break;
@@ -161,7 +163,7 @@ StateCreateNumber.prototype.execute = function(calculator, button)
         case BUTTON_MULTIPLY:
         case BUTTON_DIVIDE:
             calculator.formula.push(button.textContent);
-            calculator.formula.push('BLANK');
+            calculator.formula.push(STR_BLANK);
             calculator.changeState(new StateOperator(calculator));
             break;
 
@@ -182,7 +184,7 @@ StateCreateNumber.prototype.execute = function(calculator, button)
             break;
 
         case BUTTON_CLEAR_E:
-            calculator.formula[length - 1] = 'BLANK';
+            calculator.formula[length - 1] = STR_BLANK;
             calculator.changeState(new StateCreateNumberBlank(calculator));
             break;
     }
@@ -255,7 +257,7 @@ StateCreateNumberDecimal.prototype.execute = function(calculator, button)
         case BUTTON_MULTIPLY:
         case BUTTON_DIVIDE:
             calculator.formula.push(button.textContent);
-            calculator.formula.push('BLANK');
+            calculator.formula.push(STR_BLANK);
             calculator.changeState(new StateOperator(calculator));
             break;
 
@@ -270,7 +272,7 @@ StateCreateNumberDecimal.prototype.execute = function(calculator, button)
             break;
 
         case BUTTON_CLEAR_E:
-            calculator.formula[length - 1] = 'BLANK';
+            calculator.formula[length - 1] = STR_BLANK;
             calculator.changeState(new StateCreateNumberBlank(calculator));
             break;
     }
@@ -330,7 +332,8 @@ StateOperator.prototype.execute = function(calculator, button)
         case BUTTON_MULTIPLY:
         case BUTTON_DIVIDE:
             calculator.formula[length - 2] = button.textContent;
-            this.setButtons(calculator.buttons_obj, calculator.formula);
+            calculator.changeState(new StateOperator(calculator));
+            //this.setButtons(calculator.buttons_obj, calculator.formula);
             break;
 
         case BUTTON_CLEAR:

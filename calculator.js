@@ -92,7 +92,7 @@ Calculator.prototype.updateDisplay = function()
         this.$display_queue.text(this.formula[length-3] + ' ' + this.formula[length-2]);
 
     if (length == 0)
-        this.$display_current.text('START');
+        this.$display_current.text(STR_START);
     else
         this.$display_current.text(this.formula[length - 1]);
 };

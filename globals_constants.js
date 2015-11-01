@@ -19,4 +19,7 @@ var BUTTON_7            = '7';
 var BUTTON_8            = '8';
 var BUTTON_9            = '9';
 
+var STR_START           = 'START';
+var STR_BLANK           = 'BLANK';
+
 var calculator = null;
