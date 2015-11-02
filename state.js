@@ -93,6 +93,7 @@ StateCreateNumberBlank.prototype.execute = function(calculator, button)
 
     switch (button.textContent)
     {
+        case BUTTON_0:
         case BUTTON_1:
         case BUTTON_2:
         case BUTTON_3:
@@ -162,9 +163,18 @@ StateCreateNumber.prototype.execute = function(calculator, button)
         case BUTTON_SUBTRACT:
         case BUTTON_MULTIPLY:
         case BUTTON_DIVIDE:
+            if (length > 1)
+            {
+                // Evaluate the previous operation
+                var eval_arr = calculator.formula.splice(length - 3, 3);
+                calculator.formula.unshift(calculator.doMath(eval_arr[0], eval_arr[2], eval_arr[1]));
+            }
+
+            // Add the operator and a new blank number to the formula
             calculator.formula.push(button.textContent);
             calculator.formula.push(STR_BLANK);
             calculator.changeState(new StateOperator(calculator));
+
             break;
 
 
@@ -175,7 +185,14 @@ StateCreateNumber.prototype.execute = function(calculator, button)
 
         // Only will happen if formula length > 1
         case BUTTON_EQUALS:
-            // TODO: equals sign execution
+            // Evaluate the previous operation
+            var eval_arr = calculator.formula.splice(length - 3, 3);
+            calculator.formula.unshift(eval_arr[2]);
+            calculator.formula.unshift(eval_arr[1]);
+            calculator.formula.unshift(eval_arr[0]);
+            calculator.formula.push('=');
+            calculator.formula.push(calculator.doMath(eval_arr[0], eval_arr[2], eval_arr[1]));
+            calculator.changeState(new StateEvaluateEquals(calculator));
             break;
 
         case BUTTON_CLEAR:
@@ -256,6 +273,13 @@ StateCreateNumberDecimal.prototype.execute = function(calculator, button)
         case BUTTON_SUBTRACT:
         case BUTTON_MULTIPLY:
         case BUTTON_DIVIDE:
+            if (length > 1)
+            {
+                // Evaluate the previous operation
+                var eval_arr = calculator.formula.splice(length - 3, 3);
+                calculator.formula.unshift(calculator.doMath(eval_arr[0], eval_arr[2], eval_arr[1]));
+            }
+
             calculator.formula.push(button.textContent);
             calculator.formula.push(STR_BLANK);
             calculator.changeState(new StateOperator(calculator));
@@ -263,7 +287,13 @@ StateCreateNumberDecimal.prototype.execute = function(calculator, button)
 
         // Only will happen if formula length > 1
         case BUTTON_EQUALS:
-            // TODO: equals sign execution
+            // Evaluate the previous operation
+            var eval_arr = calculator.formula.splice(length - 3, 3);
+            calculator.formula.unshift(eval_arr[2]);
+            calculator.formula.unshift(eval_arr[1]);
+            calculator.formula.unshift(eval_arr[0]);
+            calculator.formula.push('=');
+            calculator.formula.push(calculator.doMath(eval_arr[0], eval_arr[2], eval_arr[1]));
             break;
 
         case BUTTON_CLEAR:
@@ -339,6 +369,83 @@ StateOperator.prototype.execute = function(calculator, button)
         case BUTTON_CLEAR:
             calculator.formula = [];
             calculator.changeState(new StateInitial(calculator));
+            break;
+    }
+};
+
+/**---------------------------------------------------------------------*/
+/**
+ * StateEvaluateEquals Class
+ */
+function StateEvaluateEquals(calculator)
+{
+    State.call(this, calculator);
+}
+StateEvaluateEquals.prototype = new State();
+StateEvaluateEquals.prototype.constructor = StateEvaluateEquals;
+StateEvaluateEquals.prototype.init = function(calculator)
+{
+    this.setButtons(calculator.buttons_obj);
+};
+StateEvaluateEquals.prototype.setButtons = function(buttons)
+{
+    this.disableButton(buttons[BUTTON_CLEAR_E]);
+};
+StateEvaluateEquals.prototype.execute = function(calculator, button)
+{
+    if (calculator.formula.length == 0)
+        calculator.formula[0] = '';
+
+    switch (button.textContent)
+    {
+        case BUTTON_0:
+        case BUTTON_1:
+        case BUTTON_2:
+        case BUTTON_3:
+        case BUTTON_4:
+        case BUTTON_5:
+        case BUTTON_6:
+        case BUTTON_7:
+        case BUTTON_8:
+        case BUTTON_9:
+            // We're basically starting over.
+            calculator.formula = [];
+            calculator.formula[0] = '' + button.textContent;
+            calculator.changeState(new StateCreateNumber(calculator));
+            break;
+
+        case BUTTON_DECIMAL:
+            // We're basically starting over.
+            calculator.formula = [];
+            calculator.formula[0] += '0' + button.textContent;
+            calculator.changeState(new StateCreateNumberDecimal(calculator));
+            break;
+
+        case BUTTON_ADD:
+        case BUTTON_SUBTRACT:
+        case BUTTON_MULTIPLY:
+        case BUTTON_DIVIDE:
+            calculator.formula = calculator.formula.splice(calculator.formula.length - 1, 1);
+            calculator.formula.push(button.textContent);
+            calculator.formula.push(STR_BLANK);
+            calculator.changeState(new StateOperator(calculator));
+            break;
+
+        case BUTTON_CLEAR:
+            calculator.formula = [];
+            calculator.changeState(new StateInitial(calculator));
+            break;
+
+        case BUTTON_EQUALS:
+            // Take the result and repeat the last operator and "second" number
+            var eval_arr = calculator.formula.splice(calculator.formula.length - 4, 2);
+            eval_arr.unshift(calculator.formula[calculator.formula.length - 1]);
+            calculator.formula = [];
+            calculator.formula.unshift(eval_arr[2]);
+            calculator.formula.unshift(eval_arr[1]);
+            calculator.formula.unshift(eval_arr[0]);
+            calculator.formula.push('=');
+            calculator.formula.push(calculator.doMath(eval_arr[0], eval_arr[2], eval_arr[1]));
             break;
     }
 };

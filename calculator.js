@@ -88,11 +88,54 @@ Calculator.prototype.updateDisplay = function()
     var length = formula.length;
     if (length <= 1)
         this.$display_queue.text('');
-    else // length > 1
+    else if (length == 3)
         this.$display_queue.text(this.formula[length-3] + ' ' + this.formula[length-2]);
+    else    // length > 3
+        this.$display_queue.text(this.formula[length-5] + ' ' + this.formula[length-4] + ' ' + this.formula[length-3] + ' ' + this.formula[length-2]);
 
     if (length == 0)
         this.$display_current.text(STR_START);
     else
         this.$display_current.text(this.formula[length - 1]);
+
+    if (IS_DEBUG)
+    {
+        $('#current-state').text('' + this.current_state);
+        $('#formula').text(this.formula);
+    }
+};
+
+/**
+ *
+ * @param num1
+ * @param num2
+ * @param op
+ * @returns {number}
+ */
+Calculator.prototype.doMath = function(num1, num2, op)
+{
+    var x = parseFloat(num1);
+    var y = parseFloat(num2);
+
+    var result = 0;
+
+    switch (op)
+    {
+        case '+':
+            result = x + y;
+            break;
+
+        case '-':
+            result = x - y;
+            break;
+
+        case 'x':
+            result = x * y;
+            break;
+
+        case '/':
+            result = x / y;
+            break;
+    }
+    return result;
 };

@@ -33,6 +33,11 @@ button:disabled
     background-color: #515151;
 }
 
+#debug-text
+{
+    position: absolute;
+}
+
 #calculator-body
 {
     position: relative;

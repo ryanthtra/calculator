@@ -1,19 +1,3 @@
-/**
- *
- * @param the_button
- */
-
-function resetDisplay()
-{
-    $('#display-record').text('');
-    resetCurrentInput();
-}
-
-function resetCurrentInput()
-{
-    $('#display-current').text('0');
-}
-
 document.addEventListener("DOMContentLoaded", function(event)
 {
     console.log("HELLO WORLD!!!");

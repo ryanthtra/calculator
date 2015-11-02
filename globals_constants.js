@@ -23,3 +23,5 @@ var STR_START           = 'START';
 var STR_BLANK           = 'BLANK';
 
 var calculator = null;
+
+var IS_DEBUG            = false;
