@@ -362,7 +362,6 @@ StateOperator.prototype.setButtons = function(buttons, formula)
     if (formula[formula.length - 2] == '/')
         this.disableButton(buttons[BUTTON_0]);
 
-    this.disableButton(buttons[BUTTON_EQUALS]);
     this.disableButton(buttons[BUTTON_CLEAR_E]);
 };
 StateOperator.prototype.execute = function(calculator, button)
@@ -402,6 +401,19 @@ StateOperator.prototype.execute = function(calculator, button)
         case BUTTON_CLEAR:
             calculator.formula = [];
             calculator.changeState(new StateInitial(calculator));
+            break;
+
+        case BUTTON_EQUALS:
+            // Do the operator with the number before that operator
+            calculator.formula[calculator.formula.length-1] = calculator.formula[calculator.formula.length-3];
+            var eval_arr = calculator.formula.splice(calculator.formula.length - 3, 3);
+            calculator.formula = [];
+            calculator.formula.unshift(eval_arr[2]);
+            calculator.formula.unshift(eval_arr[1]);
+            calculator.formula.unshift(eval_arr[0]);
+            calculator.formula.push('=');
+            calculator.formula.push(calculator.doMath(eval_arr[0], eval_arr[2], eval_arr[1]));
+            calculator.changeState(new StateEvaluateEquals(calculator));
             break;
     }
 };
