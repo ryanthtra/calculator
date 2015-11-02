@@ -10,6 +10,11 @@ document.addEventListener("DOMContentLoaded", function(event)
         //onCalculatorButtonClicked($(this));
         calculator.onButtonPressed(this);
     });
+
+    $('body').keydown(function(event)
+    {
+        calculator.onKeyPressed(event.which);
+    });
 });
 
 

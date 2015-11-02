@@ -6,6 +6,9 @@ function Calculator()
     this.$display_queue = null;
     this.$display_current = null;
 
+    if (IS_DEBUG)
+        this.keycode = null;
+
     this.init();
 }
 
@@ -56,6 +59,16 @@ Calculator.prototype.onButtonPressed = function(button)
     this.updateDisplay();
 };
 
+Calculator.prototype.onKeyPressed = function(key)
+{
+    this.keycode = key;
+    this.updateDisplay();
+    //var key_found = this.buttons_obj[key];
+    //if (key_found != undefined)
+    //    if ($(key_found).prop('disabled') == false)
+    //        this.onButtonPressed(key_found);
+};
+
 /**
  * changeState - changes the state of the calculator
  * @param new_state - the state we are transitioning to
@@ -100,7 +113,7 @@ Calculator.prototype.updateDisplay = function()
 
     if (IS_DEBUG)
     {
-        $('#current-state').text('' + this.current_state);
+        $('#keycode').text('' + this.keycode);
         $('#formula').text(this.formula);
     }
 };
