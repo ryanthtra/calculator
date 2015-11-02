@@ -55,7 +55,7 @@ StateInitial.prototype.execute = function(calculator, button)
             break;
 
         case BUTTON_DECIMAL:
-            calculator.formula[0] += '0' + button.textContent;
+            calculator.formula[0] = '0' + button.textContent;
             calculator.changeState(new StateCreateNumberDecimal(calculator));
             break;
     }
@@ -136,7 +136,40 @@ StateCreateNumber.prototype.init = function(calculator)
 StateCreateNumber.prototype.setButtons = function(buttons, formula)
 {
     if (formula.length <= 1)
+    {
         this.disableButton(buttons[BUTTON_EQUALS]);
+    }
+    else
+    {
+        var last_item = formula[formula.length - 1];
+
+        // If the current number entered is "0." or any "0.0..."
+        if ((parseFloat(last_item) == 0) &&
+            (formula[formula.length - 2]) == '/')
+        {
+            this.disableButton(buttons[BUTTON_ADD]);
+            this.disableButton(buttons[BUTTON_SUBTRACT]);
+            this.disableButton(buttons[BUTTON_MULTIPLY]);
+            this.disableButton(buttons[BUTTON_DIVIDE]);
+            this.disableButton(buttons[BUTTON_EQUALS]);
+        }
+    }
+
+    // If number is only one char long, and it's zero
+    // disable all the numbers
+    if (formula[formula.length-1].length == 1 && parseInt(formula[formula.length-1]) == '0')
+    {
+        this.disableButton(buttons[BUTTON_0]);
+        this.disableButton(buttons[BUTTON_1]);
+        this.disableButton(buttons[BUTTON_2]);
+        this.disableButton(buttons[BUTTON_3]);
+        this.disableButton(buttons[BUTTON_4]);
+        this.disableButton(buttons[BUTTON_5]);
+        this.disableButton(buttons[BUTTON_6]);
+        this.disableButton(buttons[BUTTON_7]);
+        this.disableButton(buttons[BUTTON_8]);
+        this.disableButton(buttons[BUTTON_9]);
+    }
 };
 StateCreateNumber.prototype.execute = function(calculator, button)
 {
@@ -417,7 +450,7 @@ StateEvaluateEquals.prototype.execute = function(calculator, button)
         case BUTTON_DECIMAL:
             // We're basically starting over.
             calculator.formula = [];
-            calculator.formula[0] += '0' + button.textContent;
+            calculator.formula[0] = '0' + button.textContent;
             calculator.changeState(new StateCreateNumberDecimal(calculator));
             break;
 
