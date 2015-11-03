@@ -18,10 +18,12 @@ var BUTTON_6            = '6';
 var BUTTON_7            = '7';
 var BUTTON_8            = '8';
 var BUTTON_9            = '9';
+var BUTTON_OPEN_PAR     = '(';
+var BUTTON_CLOSE_PAR    = ')';
 
 var STR_START           = 'START';
 var STR_BLANK           = 'BLANK';
 
-var calculator = null;
+var calculator_controller = null;
 
 var IS_DEBUG            = false;

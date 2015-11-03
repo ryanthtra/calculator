@@ -1,11 +1,11 @@
-function Calculator()
+function Calculator(calculator_controller)
 {
     this.formula = [];
     this.current_state = null;
     this.buttons_obj = {};
     this.$display_queue = null;
     this.$display_current = null;
-
+    this.controller = calculator_controller;
     if (IS_DEBUG)
         this.keycode = null;
 
@@ -151,4 +151,10 @@ Calculator.prototype.doMath = function(num1, num2, op)
             break;
     }
     return result;
+};
+
+
+Calculator.prototype.resetAll = function()
+{
+    this.controller.reset();
 };

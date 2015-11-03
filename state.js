@@ -21,9 +21,9 @@ StateInitial.prototype = new State();
 StateInitial.prototype.constructor = StateInitial;
 StateInitial.prototype.init = function(calculator)
 {
-    this.setButtons(calculator.buttons_obj);
+    this.setButtons(calculator.buttons_obj, calculator.controller);
 };
-StateInitial.prototype.setButtons = function(buttons)
+StateInitial.prototype.setButtons = function(buttons, controller)
 {
     this.disableButton(buttons[BUTTON_CLEAR]);
     this.disableButton(buttons[BUTTON_CLEAR_E]);
@@ -32,14 +32,28 @@ StateInitial.prototype.setButtons = function(buttons)
     this.disableButton(buttons[BUTTON_MULTIPLY]);
     this.disableButton(buttons[BUTTON_DIVIDE]);
     this.disableButton(buttons[BUTTON_EQUALS]);
+    //this.disableButton(buttons[BUTTON_OPEN_PAR]);
+
+    //if (controller.isFirstCalculator())
+        this.disableButton(buttons[BUTTON_CLOSE_PAR]);
 };
 StateInitial.prototype.execute = function(calculator, button)
 {
-    if (calculator.formula.length == 0)
-        calculator.formula[0] = '';
+    //if (calculator.formula.length == 0)
+    //    calculator.formula[0] = '0';
 
     switch (button.textContent)
     {
+        case BUTTON_OPEN_PAR:
+            calculator.formula[0] = calculator.controller.getValFromNewCalculator();
+            calculator.changeState(new StateCreateNumber(calculator));
+            calculator.controller.curr_cal.changeState(new StateInitial(calculator.controller.curr_cal));
+            break;
+        //
+        //case BUTTON_CLOSE_PAR:
+        //    calculator.controller.popCalculator(calculator.formula[0]);
+        //    break;
+
         case BUTTON_0:
         case BUTTON_1:
         case BUTTON_2:
@@ -64,6 +78,7 @@ StateInitial.prototype.execute = function(calculator, button)
 /**---------------------------------------------------------------------*/
 /**
  * StateCreateNumberBlank Class
+ * NOTE: last element of formula is 'BLANK'
  */
 function StateCreateNumberBlank(calculator)
 {
@@ -113,8 +128,9 @@ StateCreateNumberBlank.prototype.execute = function(calculator, button)
             break;
 
         case BUTTON_CLEAR:
-            calculator.formula = [];
-            calculator.changeState(new StateInitial(calculator));
+            //calculator.formula = [];
+            //calculator.changeState(new StateInitial(calculator));
+            calculator.resetAll();
             break;
     }
 };
@@ -131,10 +147,14 @@ StateCreateNumber.prototype = new State();
 StateCreateNumber.prototype.constructor = StateCreateNumber;
 StateCreateNumber.prototype.init = function(calculator)
 {
-    this.setButtons(calculator.buttons_obj, calculator.formula);
+    this.setButtons(calculator.buttons_obj, calculator.formula, calculator.controller);
 };
-StateCreateNumber.prototype.setButtons = function(buttons, formula)
+StateCreateNumber.prototype.setButtons = function(buttons, formula, controller)
 {
+    this.disableButton(buttons[BUTTON_OPEN_PAR]);
+    if (controller.isFirstCalculator())
+        this.disableButton(buttons[BUTTON_CLOSE_PAR]);
+
     if (formula.length <= 1)
     {
         this.disableButton(buttons[BUTTON_EQUALS]);
@@ -157,7 +177,7 @@ StateCreateNumber.prototype.setButtons = function(buttons, formula)
 
     // If number is only one char long, and it's zero
     // disable all the numbers
-    if (formula[formula.length-1].length == 1 && parseInt(formula[formula.length-1]) == '0')
+    if (formula[formula.length-1].toString().length == 1 && parseInt(formula[formula.length-1]) == 0)
     {
         this.disableButton(buttons[BUTTON_0]);
         this.disableButton(buttons[BUTTON_1]);
@@ -177,6 +197,28 @@ StateCreateNumber.prototype.execute = function(calculator, button)
 
     switch (button.textContent)
     {
+        case BUTTON_CLOSE_PAR:
+            if (length > 1)
+            {
+                // Evaluate the previous operation
+                var eval_arr = calculator.formula.splice(length - 3, 3);
+                var result = calculator.doMath(eval_arr[0], eval_arr[2], eval_arr[1]);
+                calculator.controller.popCalculator(result);
+
+                // Is the resulting number a float less than 1?
+                //if (Math.abs(result) > 0.0 && Math.abs(result) < 1.0)
+                //    calculator.changeState(new StateCreateNumberDecimal(calculator));
+                //else
+                //{
+                //    // Is the resulting number a float greater than 1?
+                //    if (parseFloat(result / parseInt(result)) > 1.0)
+                //        calculator.changeState(new StateCreateNumberDecimal(calculator));
+                //    else
+                //        calculator.changeState(new StateCreateNumber(calculator));
+                //}
+            }
+            break;
+
         case BUTTON_0:
         case BUTTON_1:
         case BUTTON_2:
@@ -229,8 +271,9 @@ StateCreateNumber.prototype.execute = function(calculator, button)
             break;
 
         case BUTTON_CLEAR:
-            calculator.formula = [];
-            calculator.changeState(new StateInitial(calculator));
+            //calculator.formula = [];
+            //calculator.changeState(new StateInitial(calculator));
+            calculator.resetAll();
             break;
 
         case BUTTON_CLEAR_E:
@@ -252,11 +295,15 @@ StateCreateNumberDecimal.prototype = new State();
 StateCreateNumberDecimal.prototype.constructor = StateCreateNumberDecimal;
 StateCreateNumberDecimal.prototype.init = function(calculator)
 {
-    this.setButtons(calculator.buttons_obj, calculator.formula);
+    this.setButtons(calculator.buttons_obj, calculator.formula, calculator.controller);
 };
-StateCreateNumberDecimal.prototype.setButtons = function(buttons, formula)
+StateCreateNumberDecimal.prototype.setButtons = function(buttons, formula, controller)
 {
     this.disableButton(buttons[BUTTON_DECIMAL]);
+
+    this.disableButton(buttons[BUTTON_OPEN_PAR]);
+    if (controller.isFirstCalculator())
+        this.disableButton(buttons[BUTTON_CLOSE_PAR]);
 
     if (formula.length <= 1)
     {
@@ -284,6 +331,28 @@ StateCreateNumberDecimal.prototype.execute = function(calculator, button)
 
     switch (button.textContent)
     {
+        case BUTTON_CLOSE_PAR:
+            if (length > 1)
+            {
+                // Evaluate the previous operation
+                var eval_arr = calculator.formula.splice(length - 3, 3);
+                var result = calculator.doMath(eval_arr[0], eval_arr[2], eval_arr[1]);
+                calculator.controller.popCalculator(result);
+
+                // Is the resulting number a float less than 1?
+                //if (Math.abs(result) > 0.0 && Math.abs(result) < 1.0)
+                //    calculator.changeState(new StateCreateNumberDecimal(calculator));
+                //else
+                //{
+                //    // Is the resulting number a float greater than 1?
+                //    if (parseFloat(result / parseInt(result)) > 1.0)
+                //        calculator.changeState(new StateCreateNumberDecimal(calculator));
+                //    else
+                //        calculator.changeState(new StateCreateNumber(calculator));
+                //}
+            }
+            break;
+
         case BUTTON_0:
         case BUTTON_1:
         case BUTTON_2:
@@ -330,8 +399,9 @@ StateCreateNumberDecimal.prototype.execute = function(calculator, button)
             break;
 
         case BUTTON_CLEAR:
-            calculator.formula = [];
-            calculator.changeState(new StateInitial(calculator));
+            //calculator.formula = [];
+            //calculator.changeState(new StateInitial(calculator));
+            calculator.resetAll();
             break;
 
         case BUTTON_CLEAR_E:
@@ -363,6 +433,7 @@ StateOperator.prototype.setButtons = function(buttons, formula)
         this.disableButton(buttons[BUTTON_0]);
 
     this.disableButton(buttons[BUTTON_CLEAR_E]);
+    this.disableButton(buttons[BUTTON_CLOSE_PAR]);
 };
 StateOperator.prototype.execute = function(calculator, button)
 {
@@ -370,6 +441,12 @@ StateOperator.prototype.execute = function(calculator, button)
 
     switch (button.textContent)
     {
+        case BUTTON_OPEN_PAR:
+            calculator.formula[length - 1] = calculator.controller.getValFromNewCalculator();
+            calculator.changeState(new StateCreateNumber(calculator));
+            calculator.controller.curr_cal.changeState(new StateInitial(calculator.controller.curr_cal));
+            break;
+
         case BUTTON_0:  // Only 0 if we're not dividing
         case BUTTON_1:
         case BUTTON_2:
@@ -399,8 +476,9 @@ StateOperator.prototype.execute = function(calculator, button)
             break;
 
         case BUTTON_CLEAR:
-            calculator.formula = [];
-            calculator.changeState(new StateInitial(calculator));
+            //calculator.formula = [];
+            //calculator.changeState(new StateInitial(calculator));
+            calculator.resetAll();
             break;
 
         case BUTTON_EQUALS:
@@ -477,8 +555,9 @@ StateEvaluateEquals.prototype.execute = function(calculator, button)
             break;
 
         case BUTTON_CLEAR:
-            calculator.formula = [];
-            calculator.changeState(new StateInitial(calculator));
+            //calculator.formula = [];
+            //calculator.changeState(new StateInitial(calculator));
+            calculator.resetAll();
             break;
 
         case BUTTON_EQUALS:
